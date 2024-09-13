@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=cp1251" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Info</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 20px;
+        }
+
+        h2 {
+            color: #555;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .error {
+            color: red;
+            font-size: 14px;
+        }
+
+        input[type="submit"] {
+            background-color: #5cb85c;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #4cae4c;
+        }
+    </style>
+</head>
+<body>
+<h2>User Info</h2>
+<br>
+<form th:action="@{saveUser}" th:object="${user}" method="post">
+    <input type="hidden" th:field="*{id}"/>
+
+    <label for="name">Name</label>
+    <input type="text" id="name" th:field="*{firstName}"/>
+    <div class="error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+
+    <label for="surname">SurName</label>
+    <input type="text" id="surname" th:field="*{lastName}"/>
+    <div class="error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+
+    <label for="department">E-mail</label>
+    <input type="text" id="department" th:field="*{email}"/>
+    <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+
+    <label for="username">Username</label>
+    <input type="text" id="username" th:field="*{username}"/>
+    <div class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+
+    <label for="password">Password</label>
+    <input type="text" id="password" th:field="*{password}"/>
+    <div class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+        <p>
+            <label>Roles:
+                <input type="checkbox" name="roles"
+                       th:each="role : ${allRoles}"
+                       th:text="${role.authority}"
+                       th:value="${role.id}"
+                       th:field="*{roles}"
+                />
+            </label>
+        </p>
+    <br>
+    <input type="submit" value="OK">
+</form>
+<!-- Кнопка Logout -->
+<form th:action="@{/logout}" method="post">
+    <button type="submit" class="logout-button">Logout</button>
+</form>
+</body>
+</html>
