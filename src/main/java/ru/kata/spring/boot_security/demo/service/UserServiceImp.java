@@ -64,4 +64,9 @@ public class UserServiceImp implements UserService {
         return userRepository.findByUsername(username);
     }
 
+    @Override
+    public User roleNull(User user) {
+        return userDao.roleNull(user);
+    }
+
 }

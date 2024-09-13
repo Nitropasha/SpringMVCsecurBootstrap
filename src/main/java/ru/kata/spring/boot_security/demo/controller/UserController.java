@@ -74,11 +74,7 @@ public class UserController {
         if (bindingResult.hasErrors()) {
             return "user-info";
         } else {
-            Role userRole = roleRepository.findById(1L)
-                    .orElseThrow(() -> new RuntimeException("Role USER not found"));
-            Set<Role> roles = new HashSet<>();
-            roles.add(userRole);
-            user.setRoles(roles);
+            userService.roleNull(user);
             userService.saveUser(user);
             return "redirect:/user";
         }
@@ -91,7 +87,6 @@ public class UserController {
         List<Role> roles = userService.getAllRoles();
         model.addAttribute("allRoles", roles);
         return "user-info";
-
     }
 
     @RequestMapping("admin/delete")

@@ -11,6 +11,7 @@ public interface UserDao {
    void saveUser(User user);
    User getUser(Long id);
    void deleteUser(Long id);
+   User roleNull(User user);
 
 
 }
