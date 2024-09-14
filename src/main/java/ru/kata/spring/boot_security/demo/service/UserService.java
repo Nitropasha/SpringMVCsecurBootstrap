@@ -16,6 +16,7 @@ public interface UserService {
       List<User> allUsers();
       List<Role> getAllRoles();
       User findByUserName (String string);
+      User findByEmail (String string);
       User roleNull (User user);
 
 }

@@ -28,14 +28,29 @@ public class UserServesTwo implements  UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = findByUserName(username);
-        if (user== null) {
-            throw new UsernameNotFoundException(String.format("User '%s' not founded", username));
-        }
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), mapRolesToAuthority(user.getRoles()));
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = findByEmail(email); // Измените на поиск по email
+        System.err.println("ИЩЕМ" + email);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found with email: " + email);
+
+        }
+        System.err.println("НАШЛИ");
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(),
+                user.getAuthorities());
+    }
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        User user = findByUserName(username);
+//        if (user== null) {
+//            throw new UsernameNotFoundException(String.format("User '%s' not founded", username));
+//        }
+//        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), mapRolesToAuthority(user.getRoles()));
+//    }
 
     private Collection<? extends GrantedAuthority> mapRolesToAuthority(Collection<Role> roles) {
         return roles.stream().map(r -> new SimpleGrantedAuthority(r.getAuthority())).collect(Collectors.toList());

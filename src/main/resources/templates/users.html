@@ -3,122 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Users</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-        }
+    <title>User Management</title>
 
-        table {
-            width: 80%;
-            border-collapse: collapse;
-            margin: 25px 0;
-            font-size: 18px;
-            text-align: left;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        tr:hover {
-            background-color: #f1f1f1;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        td {
-            color: #555;
-        }
-
-        th {
-            color: #555;
-            font-weight: bold;
-        }
-
-        @media (max-width: 768px) {
-            table {
-                width: 100%;
-            }
-
-            th, td {
-                font-size: 16px;
-                padding: 10px 12px;
-            }
-        }
-
-        .button-style {
-            background-color: #5cb85c;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-top: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-
-        .button-style:hover {
-            background-color: #4cae4c;
-            transform: translateY(-2px);
-        }
-
-        .button-style:active {
-            background-color: #449d44;
-            transform: translateY(0);
-        }
-    </style>
+    <!-- Подключаем Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-light">
 
-<table>
-    <thead>
-    <tr>
-        <th>First Name </th>
-        <th>Last Name </th>
-        <th>Email</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="msg : ${users}">
-        <td th:utext="${msg.firstName}"></td>
-        <td th:utext="${msg.lastName}"></td>
-        <td th:utext="${msg.email}"></td>
-        <td>
-            <button type="button" th:onclick="|window.location.href='admin/updateInfo?id=' + ${msg.id}|">Update</button>
-            <button type="button" th:onclick="|window.location.href='admin/delete?id=' + ${msg.id}|">Delete</button>
-        </td>
-    </tr>
-    </tbody>
-</table>
+<div class="container mt-5">
+    <!-- Заголовок -->
+    <h2 class="text-center mb-4">User Management</h2>
 
-<!-- Кнопка Add -->
-<input type="button" value="Add" class="button-style" onclick="window.location.href='admin/addNewUser'"/>
+    <!-- Навигационные вкладки -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="users-tab" data-bs-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="true">Users</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="add-user-tab" data-bs-toggle="tab" href="#add-user" role="tab" aria-controls="add-user" aria-selected="false">Add User</a>
+        </li>
+    </ul>
 
-<!-- Кнопка Logout -->
-<form th:action="@{/logout}" method="post">
-    <button type="submit" class="button-style">Logout</button>
-</form>
+    <!-- Содержимое вкладок -->
+    <div class="tab-content mt-3" id="myTabContent">
+        <!-- Вкладка Users -->
+        <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
+            <!-- Таблица пользователей -->
+            <h3 class="mb-4">All Users</h3>
+            <table class="table table-hover table-bordered">
+                <thead class="table-light">
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Roles</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.firstName}">John</td>
+                    <td th:text="${user.lastName}">Doe</td>
+                    <td th:text="${user.email}">john.doe@example.com</td>
+                    <td>
+                        <span th:each="role, iterStat : ${user.roles}">
+                            <span th:text="${role.authority}"></span><span th:if="${!iterStat.last}">, </span>
+                        </span>
+                    </td>
+                    <td>
+                        <!-- Кнопка Update -->
+                        <button type="button" class="btn btn-primary btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#updateModal"
+                                th:attr="data-bs-userid=${user.id},
+                                     data-bs-firstname=${user.firstName},
+                                     data-bs-lastname=${user.lastName},
+                                     data-bs-email=${user.email},
+                                     data-bs-username=${user.username},
+                                     data-bs-password=${user.password},
+                                     data-bs-roles=${user.roles}">
+                            Update
+                        </button>
+
+                        <!-- Кнопка Delete -->
+                        <button type="button" class="btn btn-danger btn-sm"
+                                th:onclick="|window.location.href='admin/delete?id=' + ${user.id}|">
+                            Delete
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- Кнопка Logout -->
+            <form th:action="@{/logout}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-warning">Logout</button>
+            </form>
+        </div>
+
+        <!-- Вкладка Add User -->
+        <div class="tab-pane fade" id="add-user" role="tabpanel" aria-labelledby="add-user-tab">
+            <h3 class="mb-4">Add User</h3>
+            <form th:action="@{admin/saveUser}" th:object="${user}" method="post">
+                <input type="hidden" th:field="*{id}"/>
+
+                <div class="mb-3">
+                    <label for="name1" class="form-label">Name</label>
+                    <input type="text" id="name1" th:field="*{firstName}" class="form-control" required>
+                    <div class="error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="surname1" class="form-label">Surname</label>
+                    <input type="text" id="surname1" th:field="*{lastName}" class="form-control" required>
+                    <div class="error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email1" class="form-label">E-mail</label>
+                    <input type="text" id="email1" th:field="*{email}" class="form-control"required>
+                    <div class="error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}" ></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="username1" class="form-label">Username</label>
+                    <input type="text" id="username1" th:field="*{username}" class="form-control" required>
+                    <div class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}" ></div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password1" class="form-label">Password</label>
+                    <input type="text" id="password1" th:field="*{password}" class="form-control" required>
+                    <div class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Roles</label>
+                    <div th:each="role : ${allRoles}" class="form-check">
+                        <input type="checkbox" class="form-check-input" th:value="${role.id}" th:field="*{roles}"/>
+                        <label class="form-check-label" th:text="${role.authority}"></label>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save User</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно Update -->
+    <div class="modal fade" id="updateModal" tabindex="-1" aria-labelledby="updateModalLabel" aria-hidden="true"
+         th:object="${user}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Update User Info</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form th:action="@{/admin/saveUser}" method="post">
+                        <input type="hidden" id="userId" name="id">
+
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" required>
+                            <div class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password">
+                            <div class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="roles" class="form-label">Roles</label>
+                            <select id="roles" name="roles" class="form-select" multiple required>
+                                <option th:each="role : ${allRoles}"
+                                        th:value="${role.id}"
+                                        th:text="${role.authority}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключение Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Скрипт для заполнения полей модального окна -->
+<script>
+    var updateModal = document.getElementById('updateModal');
+    updateModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+        var userId = button.getAttribute('data-bs-userid');
+        var firstName = button.getAttribute('data-bs-firstname');
+        var lastName = button.getAttribute('data-bs-lastname');
+        var email = button.getAttribute('data-bs-email');
+        var username = button.getAttribute('data-bs-username');
+        var password = button.getAttribute('data-bs-password');
+        var roles = button.getAttribute('data-bs-roles');
+
+        // Заполняем поля формы в модальном окне
+        document.getElementById('userId').value = userId;
+        document.getElementById('firstName').value = firstName;
+        document.getElementById('lastName').value = lastName;
+        document.getElementById('email').value = email;
+        document.getElementById('username').value = username;
+        document.getElementById('password').value = password;
+
+        // Обработка ролей
+        var roleArray = roles.split(',').map(function(role) {
+            return role.trim();
+        });
+
+        var roleSelect = document.getElementById('roles');
+        var options = roleSelect.options;
+
+        // Сбрасываем все выбранные опции
+        for (var i = 0; i < options.length; i++) {
+            options[i].selected = false;
+        }
+
+        // Отмечаем опции в соответствии с ролями пользователя
+        for (var i = 0; i < options.length; i++) {
+            var optionText = options[i].text.trim().toLowerCase();
+            var roleText = roleArray.map(role => role.toLowerCase());
+
+            if (roleText.includes(optionText)) {
+                options[i].selected = true;
+            }
+        }
+    });
+</script>
 
 </body>
 </html>

@@ -28,18 +28,25 @@ public class UserController {
     private RoleRepository roleRepository;
     @Autowired
     private UserService userService;
+    // Login form
 
     @RequestMapping(value = "/admin")
     public String printWelcome(Model model) {
         List<User> users = userService.allUsers();
         model.addAttribute("users", users);
+        // Добавляем пустого пользователя для формы в модальном окне
+        model.addAttribute("user", new User());
+        List<Role> roles = userService.getAllRoles();
+        model.addAttribute("allRoles", roles);
+
         return "users";
     }
 
     @RequestMapping(value = "/user")
     public String printUserPage(Principal principal, Model model) {
+        User user = userService.findByEmail(principal.getName());
+        System.err.println(principal.getName());
 
-        User user = userService.findByUserName(principal.getName());
         model.addAttribute("user", user);
         List<Role> roles = userService.getAllRoles();
         model.addAttribute("allRoles", roles);
@@ -55,17 +62,19 @@ public class UserController {
         return "user-info";
     }
 
-    @RequestMapping("admin/saveUser")
-    public String saveEmployee(@Valid @ModelAttribute("user") User user,
-                               BindingResult bindingResult) {
+    @RequestMapping(value = "/admin/saveUser", method = RequestMethod.POST)
+    public String saveUser(@Valid @ModelAttribute("user") User user, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
-            return "user-info";
+            // Если есть ошибки, вернуться на ту же страницу
+            return "users";
         } else {
+            // Если ID пользователя существует, обновляем данные, иначе создаем нового
             userService.saveUser(user);
             return "redirect:/admin";
         }
     }
+
 
     @RequestMapping("user/saveUser2")
     public String saveEmployee2(@Valid @ModelAttribute("user") User user,
